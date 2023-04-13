@@ -19,7 +19,16 @@ function addMessage(message){
 function handleNicknameSubmit(event) {
     event.preventDefault();
     const input = room.querySelector("#name input");
-    socket.emit("nickname", input.value);
+    const ul = room.querySelector("ul");
+    const li = document.createElement("li");
+    const value = input.value;
+    li.innerText = `Hi! ${value} (You can always change your nickname.) `;
+    ul. appendChild(li);
+    //socket.emit("nickname", input.value);
+    socket.emit("nickname", input.value, ()=> {
+        addMessage(`${value} changed nickname as ${value}`)
+    })
+    input.value="";
 }
 
 function handleMessageSubmit(event){
@@ -54,11 +63,15 @@ function handleRoomSubmit(event){
 
 form.addEventListener("submit", handleRoomSubmit);
 
-socket.on("welcome", (user) => {
+socket.on("welcome", (user, newCount) => {
+    const h3 = room.querySelector("h3");
+    h3.innerText = `Room ${roomName} (${newCount})`;
    addMessage(`${user} just joined. Please welcome!`);
 });
 
-socket.on("bye", (left) => {
+socket.on("bye", (left, newCount) => {
+    const h3 = room.querySelector("h3");
+    h3.innerText = `Room ${roomName} (${newCount})`;
     addMessage(`${left} left :-'(`);
 });
 
